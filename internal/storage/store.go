@@ -20,18 +20,20 @@ func NewTaskStore() *TaskStore {
 func (s *TaskStore) Get(id string) (*domain.Task, bool) {
     s.mu.RLock()
     defer s.mu.RUnlock()
+    
     t, ok := s.tasks[id]
     return t, ok
 }
 
 func (s *TaskStore) Set(t *domain.Task) {
     s.mu.Lock()
+    defer s.mu.Unlock()
+
     s.tasks[t.ID] = t
-    s.mu.Unlock()
 }
 
 func (s *TaskStore) Delete(id string) {
     s.mu.Lock()
+    defer s.mu.Unlock()
     delete(s.tasks, id)
-    s.mu.Unlock()
 }
