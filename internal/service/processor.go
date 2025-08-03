@@ -3,26 +3,31 @@ package service
 import (
 	"math/rand"
 	"time"
+	"net/http"
+	
 
 	"github.com/iktkhor/task-service/internal/domain"
 	"github.com/iktkhor/task-service/internal/storage"
 )
 
-func ProcessTask(t *domain.Task, store *storage.TaskStore) {
-    t.Status = domain.StatusRunning
-    t.StartedAt = time.Now()
-    store.Set(t)
-
+func GenRandSleep() int {
 	// Генерация случайного времени выполнения от 180 до 300 секунд
 	min := 180
 	max := 300
 	rs := rand.Intn(max-min+1) + min
+	return rs
+}
 
-    time.Sleep(time.Duration(rs) * time.Second)
+func ProcessTask(t domain.Task, ts *storage.TaskStore) {
+    t.Status = http.StatusProcessing
+    t.StartedAt = time.Now()
+    ts.Set(t)
+
+    time.Sleep(time.Duration(GenRandSleep()) * time.Second)
 
     t.FinishedAt = time.Now()
     t.Duration = t.FinishedAt.Sub(t.StartedAt).String()
-    t.Status = domain.StatusCompleted
+    t.Status = http.StatusOK
 
-    store.Set(t)
+    ts.Set(t)
 }
