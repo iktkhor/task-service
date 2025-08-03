@@ -7,25 +7,25 @@ import (
 )
 
 type TaskStore struct {
-    mu    sync.RWMutex
-    tasks map[string]*domain.Task
+    mu    sync.Mutex
+    tasks map[string]domain.Task
 }
 
-func NewTaskStore() *TaskStore {
+func New() *TaskStore {
     return &TaskStore{
-        tasks: make(map[string]*domain.Task),
+        tasks: make(map[string]domain.Task),
     }
 }
 
-func (s *TaskStore) Get(id string) (*domain.Task, bool) {
-    s.mu.RLock()
-    defer s.mu.RUnlock()
+func (s *TaskStore) Get(id string) (domain.Task, bool) {
+    s.mu.Lock()
+    defer s.mu.Unlock()
     
     t, ok := s.tasks[id]
     return t, ok
 }
 
-func (s *TaskStore) Set(t *domain.Task) {
+func (s *TaskStore) Set(t domain.Task) {
     s.mu.Lock()
     defer s.mu.Unlock()
 
