@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-    store := storage.NewTaskStore()
+    store := storage.New()
     http.HandleFunc("/tasks", api.CreateTaskHandler(store))
     http.HandleFunc("/tasks/", api.TaskByIDHandler(store))
 
