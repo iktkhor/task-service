@@ -26,7 +26,6 @@ func ProcessTask(t domain.Task, ts *storage.TaskStore) {
     time.Sleep(time.Duration(GenRandSleep()) * time.Second)
 
     t.FinishedAt = time.Now()
-    t.Duration = t.FinishedAt.Sub(t.StartedAt).String()
     t.Status = http.StatusOK
 
     ts.Set(t)

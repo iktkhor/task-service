@@ -19,16 +19,40 @@ func generateID() string {
 	return hex.EncodeToString(b)
 }
 
+func taskHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		postTask(w, r)
+	case http.MethodGet:
+		getTask(w, r)
+	case http.MethodDelete:
+		deleteTask(w, r)
+	default:
+		http.Error(w, "Invalid method", http.StatusMethodNotAllowed)
+	}
+}
+
+func postTask(w http.ResponseWriter, r *http.Request) {
+	id := generateID()
+
+}
+
+func getTask(w http.ResponseWriter, r *http.Request) {
+	
+}
+
+func deleteTask(w http.ResponseWriter, r *http.Request) {
+	
+}
+
 func CreateTaskHandler(store *storage.TaskStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		id := generateID()
 		task := &domain.Task{
 			ID:        id,
-			Status:    domain.StatusPending,
+			Status:    http.StatusCreated,
 			CreatedAt: time.Now(),
 		}
 		store.Set(task)
@@ -49,15 +73,6 @@ func TaskByIDHandler(store *storage.TaskStore) http.HandlerFunc {
 					ID:        task.ID,
 					Status:    string(task.Status),
 					CreatedAt: task.CreatedAt.Format("02.01.2006 15:04:05"),
-				}
-
-				switch task.Status {
-				case domain.StatusPending:
-					resp.CurDuration = "Task not started yet"
-				case domain.StatusRunning:
-					resp.CurDuration = time.Since(task.StartedAt).String()
-				case domain.StatusCompleted:
-					resp.CurDuration = task.Duration
 				}
 
 				w.Header().Set("Content-Type", "application/json")
