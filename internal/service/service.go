@@ -4,11 +4,19 @@ import (
 	"math/rand"
 	"time"
 	"net/http"
-	
+	"crypto/rand"
+	"encoding/hex"
 
 	"github.com/iktkhor/task-service/internal/domain"
 	"github.com/iktkhor/task-service/internal/storage"
 )
+
+func generateID() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return hex.EncodeToString(b)
+}
+
 
 func GenRandSleep() int {
 	// Генерация случайного времени выполнения от 180 до 300 секунд

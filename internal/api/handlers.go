@@ -1,8 +1,6 @@
 package api
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -13,11 +11,7 @@ import (
 	"github.com/iktkhor/task-service/internal/storage"
 )
 
-func generateID() string {
-	b := make([]byte, 16)
-	rand.Read(b)
-	return hex.EncodeToString(b)
-}
+
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -33,7 +27,17 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func postTask(w http.ResponseWriter, r *http.Request) {
-	id := generateID()
+		task := domain.Task{
+			ID:        generateID(),
+			Status:    http.StatusCreated,
+			CreatedAt: time.Now(),
+		}
+		
+		store.Set(task)
+		go service.ProcessTask(task, store)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(task)
 
 }
 
@@ -43,24 +47,6 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
 	
-}
-
-func CreateTaskHandler(store *storage.TaskStore) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			return
-		}
-		task := &domain.Task{
-			ID:        id,
-			Status:    http.StatusCreated,
-			CreatedAt: time.Now(),
-		}
-		store.Set(task)
-		go service.ProcessTask(task, store)
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(task)
-	}
 }
 
 func TaskByIDHandler(store *storage.TaskStore) http.HandlerFunc {
