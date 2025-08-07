@@ -11,8 +11,6 @@ import (
 	"github.com/iktkhor/task-service/internal/storage"
 )
 
-
-
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
